@@ -18,31 +18,50 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 ## Estado actual
 - **v1.0.0 publicada** (2026-10-30): tab Coberturas con 4-3-4 + Cover 3 (Sky) vs Shotgun 2x2, selector de hash, toggle pre/post-snap y panel de responsabilidad.
 - **Revisión de Samuel a v1.0.0:** aprobó el menú (espaciado, colores, tipografía), el campo, el pre/post-snap y los cambios de hash.
+- **v1.0.1 publicada** (2026-10-30): `CLAUDE.md` y ramas `release/`. Merge en `main` vía PR #1. Falta el tag `v1.0.1`.
+- **En curso: v1.1.0** en la rama `release/1.1.0`. Las decisiones quedaron cerradas con Samuel el 2026-10-30 (ver "v1.1.0: decisiones cerradas").
 - **Pendiente de Samuel:**
-  - Confirmar las asignaciones de Cover 3: SS curl/flat strong (apex a 7 yd), Will curl/flat weak, Sam y Mike hook/curl, FS deep middle, CBs deep thirds por fuera.
-  - Su documento o PDF con frentes y covers.
-  - Convenciones propias, p. ej. en su 4-2-5, ¿el Nickel juega del lado de la strength o del field?
-- **Siguiente: v1.1.0** (ver Roadmap).
+  - Revisar las 30 combinaciones en el modo Verificar cuando salga v1.1.0, incluida la Cover 3 de v1.0.0.
+  - Su documento o PDF con frentes y covers, si lo consigue. No bloquea nada: entra como parches 1.1.x.
 
 ## Roadmap (SemVer, una versión menor por milestone)
 | Versión | Contenido | Estado |
 |---|---|---|
 | v1.0.0 | Setup, deploy, 4-3-4 + Cover 3 vs 2x2 | ✅ |
-| v1.0.1 | CLAUDE.md, convención de ramas `release/` | en curso |
-| v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | siguiente |
+| v1.0.1 | CLAUDE.md, convención de ramas `release/` | ✅ |
+| v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | en curso |
+| v1.1.x | Correcciones de Samuel desde el modo Verificar | |
 | v1.2.0 | **Comparar**: dos campos lado a lado con los cambios de rol resaltados (`engine/diff.ts`) | |
 | v1.3.0 | **Whiteboard** | |
 | v1.4.0 | Biblioteca de jugadas (guardado manual, `localStorage`, `schemaVersion`), exportar PNG con Web Share, PWA offline | |
 | v2.0.0 | Animación snap → rutas → drops | |
 
-**v1.1.0, alcance:**
-- Frentes: 4-3-4, 3-4-4, 4-2-5, 3-3-5, 3-5-3, 5-3-3. Covers: 0, 2, 3, 4, 6 (solo la versión base de cada uno).
-  - C0: man + blitz. C2: zona. C3: Sky. C4: Quarters. C6: quarters hacia la strength y half al lado débil.
-- En los frentes con 3 DBs (3-5-3, 5-3-3), un LB toma el rol de DB faltante con `hybrid: true`.
-- Formaciones: Shotgun 2x2, 3x1, Trips, Bunch, Pro/I-Form, Empty 3x2.
-- **Modo Verificar** (`src/features/verify/`): por cada frente + cover, una lista de los 11 defensores con rol, zona y profundidad.
-  - Cada fila se marca ✔ OK o ✘ Corregir, con nota. El estado se guarda en el dispositivo.
-  - Botón "Copiar resumen" para que Samuel lo pegue en la conversación.
+**v1.1.0: decisiones cerradas (2026-10-30)**
+- **Fuente:** se cargan las 30 combinaciones con la versión **estándar** de football, sin esperar el PDF. Samuel las revisa en el modo Verificar y sus correcciones salen como parches 1.1.x.
+- **Criterio de lanzamiento:** v1.1.0 sale cuando el contenido está cargado, los tests pasan y la app se ve bien en iPad. **No** se espera a que Samuel revise las 30 combinaciones.
+- **Frentes:** 4-3-4, 3-4-4, 4-2-5, 3-3-5, 3-5-3, 5-3-3.
+- **Nickel** (4-2-5 y 3-3-5): del lado de la **strength**, sobre el slot fuerte.
+- **Híbrido** (3-5-3 y 5-3-3): el **OLB del lado de la strength** (Spur/Bandit) toma el rol del DB faltante en Cover 2, 4 y 6, con `hybrid: true`. En Cover 3 sigue como LB en el curl/flat.
+- **Covers** (solo la versión base):
+  - **Cover 0:** CBs en man sobre los #1. El defensor más cercano a cada uno cubre en man al #2 strong, al #2 weak y al RB. FS sobre el #3 si existe. Todos los demás hacen blitz o rush. Sin safety profundo.
+  - **Cover 2:** zona. CBs en el flat, safeties en las dos mitades profundas, LBs en hook/curl y hole.
+  - **Cover 3:** Sky (como v1.0.0).
+  - **Cover 4:** quarters. Los 4 DBs en cuartos profundos, sin pattern match.
+  - **Cover 6:** quarters hacia la **strength**, Cover 2 (half + CB en el flat) hacia el lado débil.
+  - Tampa 2, Sky/Buzz/Cloud y pattern match quedan para la fase 2.
+- **Formaciones:**
+  - **Shotgun 2x2:** la de v1.0.0.
+  - **Shotgun 3x1:** 3 receptores abiertos con splits normales.
+  - **Trips:** 3 receptores más pegados, con el slot reducido.
+  - **Bunch:** 3 receptores apiñados.
+  - **Pro/I-Form:** TE, FB y RB en I, QB bajo center.
+  - **Empty 3x2:** 5 receptores, sin RB.
+- **Arrastrar defensores:** mueve solo la alineación **pre-snap**; el rol (zona o man) no cambia. Los cambios se borran solos al cambiar frente, cover, formación o hash, y también con el botón **Reset**.
+- **Modo Verificar** (`src/features/verify/`):
+  - Una tabla por frente + cover con los 11 defensores: rol, zona y profundidad.
+  - Se verifica contra **Shotgun 2x2 con balón al centro**; la nota guarda qué formación estaba viendo.
+  - Cada fila se marca ✔ OK o ✘ Corregir, con nota. El estado se guarda en el dispositivo (`localStorage`).
+  - Botón "Copiar resumen" genera texto para pegar en el chat.
 
 **v1.3.0, Whiteboard:**
 - Más uso en vivo que preparado.
@@ -122,7 +141,7 @@ Los skills `antislop`, `antislop-layoutmobile`, `frontend-design`, `web-interfac
 - **Tipografía:** Barlow Condensed (títulos, etiquetas, campo; estilo gráfico de transmisión) y Barlow (texto).
 - **Colores de responsabilidad** (`data/theme.ts`): Deep `#2f80ed`, Hook/Curl `#a259ff`, Flat y Curl/Flat `#ffd23f`, Man `#ff4d4d`, Rush `#c9d1d9`, Blitz `#ff8a00`.
   - El anillo del defensor usa el color de su responsabilidad: es el motivo de identidad de la app.
-  - Un híbrido lleva además un anillo punteado blanco.
+  - **Híbrido** (decisión de Samuel para v1.1.0): letra en **rojo** y el borde del propio círculo **punteado**, en el color de su responsabilidad. Sustituye al anillo blanco extra de v1.0.0. La leyenda debe reflejarlo.
 - **No hay logo:** "DB Coach" va como texto. No crees logos, íconos ni imágenes sin preguntar.
 - Botones de 44px mínimo, foco visible, controles navegables con teclado. La barra espaciadora alterna el snap.
 - Controles que aún no existen: se ven deshabilitados con la nota de la versión en que llegan. Nada de botones muertos.
