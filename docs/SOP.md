@@ -11,7 +11,7 @@ El coach pide, Claude edita.
 Los cambios se agrupan en lotes semanales o mensuales. Una corrección urgente puede salir sola como parche.
 
 ## SOP-2: Desarrollo
-- Ramas: `feat/…` (funcionalidad), `fix/…` (bug), `content/…` (datos de football). No se trabaja directo en `main`.
+- Ramas: `release/X.Y.Z` agrupa el trabajo de una versión; dentro de ella, o para cambios sueltos, `feat/…` (funcionalidad), `fix/…` (bug), `content/…` (datos de football). No se trabaja directo en `main`.
   La única excepción fue el commit inicial de v1.0.0, que creó `main`.
 - Cada PR: `npm test` en verde, `npm run build` sin errores y captura de pantalla si cambia algo visual.
 - `src/engine/` no importa React. Los componentes no contienen reglas de football.

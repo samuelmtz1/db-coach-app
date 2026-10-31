@@ -1,7 +1,7 @@
 {
   "name": "db-coach-app",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Herramienta para enseñar coberturas a Defensive Backs: frentes, covers y whiteboard.",
   "type": "module",
   "scripts": {
