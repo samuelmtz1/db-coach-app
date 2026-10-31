@@ -46,6 +46,17 @@
 .player-move {
   transition: transform 450ms cubic-bezier(0.3, 0.7, 0.2, 1);
 }
+/* Mientras se arrastra, el círculo sigue al dedo sin retraso. */
+.player-move.is-dragging {
+  transition: none;
+}
+.draggable {
+  cursor: grab;
+  touch-action: none;
+}
+.draggable.is-dragging {
+  cursor: grabbing;
+}
 .fade-in {
   animation: fade-in 350ms ease-out both;
 }

@@ -1,0 +1,73 @@
+import type { Assignment } from '../../engine/types'
+import { BLITZ, RUSH, apex, man, onHash, onReceiver, overBall, zone } from '../roles'
+
+// 3-5-3: DE_S, NT, DE_W · SPUR, SAM, MIKE, WILL, JACK · CB_S, CB_W, FS
+// Spur (OLB strong) es híbrido en Cover 2, 4 y 6: hace el trabajo del SS que no hay.
+// En Cover 3 sigue de LB en el curl/flat strong. El 4º rusher es Jack.
+export const a353: Record<string, Record<string, Assignment>> = {
+  'cover-0': {
+    DE_S: { role: RUSH },
+    NT: { role: RUSH },
+    DE_W: { role: RUSH },
+    SAM: { role: BLITZ },
+    WILL: { role: BLITZ },
+    SPUR: { role: man('S2'), align: onReceiver('S2', -1, 5) },
+    JACK: { role: man('W2', 'FB'), align: onReceiver('W2', -1, 5) },
+    MIKE: { role: man('RB') },
+    CB_S: { role: man('S1'), align: onReceiver('S1', -1, 5) },
+    CB_W: { role: man('W1'), align: onReceiver('W1', -1, 5) },
+    FS: { role: man('S3'), align: onReceiver('S3', -1, 6) },
+  },
+  'cover-2': {
+    DE_S: { role: RUSH },
+    NT: { role: RUSH },
+    DE_W: { role: RUSH },
+    JACK: { role: RUSH },
+    SAM: { role: zone('hookCurl', 'S') },
+    MIKE: { role: zone('hole', 'M') },
+    WILL: { role: zone('hookCurl', 'W') },
+    CB_S: { role: zone('flat', 'S'), align: onReceiver('S1', 1, 5) },
+    CB_W: { role: zone('flat', 'W'), align: onReceiver('W1', 1, 5) },
+    SPUR: { role: zone('deepHalf', 'S'), align: onHash('S', 0, 12), hybrid: true },
+    FS: { role: zone('deepHalf', 'W'), align: onHash('W', 0, 12) },
+  },
+  'cover-3': {
+    DE_S: { role: RUSH },
+    NT: { role: RUSH },
+    DE_W: { role: RUSH },
+    JACK: { role: RUSH },
+    SPUR: { role: zone('curlFlat', 'S') },
+    SAM: { role: zone('hookCurl', 'S') },
+    MIKE: { role: zone('hookCurl', 'W') },
+    WILL: { role: zone('curlFlat', 'W'), align: apex('W', 5) },
+    CB_S: { role: zone('deepThird', 'S'), align: onReceiver('S1', 1, 7) },
+    CB_W: { role: zone('deepThird', 'W'), align: onReceiver('W1', 1, 7) },
+    FS: { role: zone('deepThird', 'M'), align: overBall(0, 13) },
+  },
+  'cover-4': {
+    DE_S: { role: RUSH },
+    NT: { role: RUSH },
+    DE_W: { role: RUSH },
+    JACK: { role: RUSH },
+    SAM: { role: zone('curlFlat', 'S'), align: apex('S', 5) },
+    MIKE: { role: zone('hookCurl', 'M') },
+    WILL: { role: zone('curlFlat', 'W'), align: apex('W', 5) },
+    CB_S: { role: zone('deepQuarter', 'S', 'outside'), align: onReceiver('S1', 1, 8) },
+    CB_W: { role: zone('deepQuarter', 'W', 'outside'), align: onReceiver('W1', 1, 8) },
+    SPUR: { role: zone('deepQuarter', 'S', 'inside'), align: onHash('S', -1, 10), hybrid: true },
+    FS: { role: zone('deepQuarter', 'W', 'inside'), align: onHash('W', -1, 10) },
+  },
+  'cover-6': {
+    DE_S: { role: RUSH },
+    NT: { role: RUSH },
+    DE_W: { role: RUSH },
+    JACK: { role: RUSH },
+    SAM: { role: zone('curlFlat', 'S'), align: apex('S', 5) },
+    MIKE: { role: zone('hookCurl', 'S') },
+    WILL: { role: zone('hookCurl', 'W') },
+    CB_S: { role: zone('deepQuarter', 'S', 'outside'), align: onReceiver('S1', 1, 8) },
+    SPUR: { role: zone('deepQuarter', 'S', 'inside'), align: onHash('S', -1, 10), hybrid: true },
+    CB_W: { role: zone('flat', 'W'), align: onReceiver('W1', 1, 5) },
+    FS: { role: zone('deepHalf', 'W'), align: onHash('W', 0, 12) },
+  },
+}

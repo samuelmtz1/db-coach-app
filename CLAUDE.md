@@ -19,7 +19,7 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 - **v1.0.0 publicada** (2026-10-30): tab Coberturas con 4-3-4 + Cover 3 (Sky) vs Shotgun 2x2, selector de hash, toggle pre/post-snap y panel de responsabilidad.
 - **Revisión de Samuel a v1.0.0:** aprobó el menú (espaciado, colores, tipografía), el campo, el pre/post-snap y los cambios de hash.
 - **v1.0.1 publicada** (2026-10-30): `CLAUDE.md` y ramas `release/`. Merge en `main` vía PR #1. Falta el tag `v1.0.1`.
-- **En curso: v1.1.0** en la rama `release/1.1.0`. Las decisiones quedaron cerradas con Samuel el 2026-10-30 (ver "v1.1.0: decisiones cerradas").
+- **v1.1.0 construida** (2026-10-31) en la rama `release/1.1.0`: 30 combinaciones, 6 formaciones, arrastrar con Reset y tab Verificar. Falta el merge a `main` y el tag `v1.1.0`. Convenciones estándar elegidas sin el PDF: ver `docs/CONTENT-GUIDE.md`, sección "Convenciones de esta versión".
 - **Pendiente de Samuel:**
   - Revisar las 30 combinaciones en el modo Verificar cuando salga v1.1.0, incluida la Cover 3 de v1.0.0.
   - Su documento o PDF con frentes y covers, si lo consigue. No bloquea nada: entra como parches 1.1.x.
@@ -29,7 +29,7 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 |---|---|---|
 | v1.0.0 | Setup, deploy, 4-3-4 + Cover 3 vs 2x2 | ✅ |
 | v1.0.1 | CLAUDE.md, convención de ramas `release/` | ✅ |
-| v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | en curso |
+| v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | ✅ construida, falta merge |
 | v1.1.x | Correcciones de Samuel desde el modo Verificar | |
 | v1.2.0 | **Comparar**: dos campos lado a lado con los cambios de rol resaltados (`engine/diff.ts`) | |
 | v1.3.0 | **Whiteboard** | |
@@ -95,26 +95,28 @@ docs/CONTENT-GUIDE.md   cómo editar frentes/covers/formaciones (atajos de roles
 docs/source/            documentos/PDFs del coach (fuente de verdad)
 .github/workflows/deploy.yml   push a main → test + build + deploy a GitHub Pages
 src/
-  app/App.tsx           header, tabs (Comparar/Whiteboard marcadas "Próximamente"), footer con versión
-  features/coverage-lab/  CoverageLab.tsx (controles + estados), Diagram.tsx (capas del campo)
+  app/App.tsx           header, tabs por URL (#coberturas, #verificar; Comparar/Whiteboard "Próximamente"), footer
+  features/coverage-lab/  CoverageLab.tsx (controles + estados), Diagram.tsx (capas del campo, arrastre)
+  features/verify/      VerifyMode.tsx (matriz, diagrama, lista), checklist.ts (+ test): tabla, progreso, resumen
   components/field/     Field.tsx (campo SVG), Players.tsx, Overlays.tsx (zonas, flechas, man), Legend.tsx
-  components/ui/        OptionGroup.tsx (botones tipo radio, 44px mínimo)
+  components/ui/        OptionGroup.tsx (botones tipo radio, 44px mínimo), SnapToggle.tsx
   engine/               lógica pura, sin React
     types.ts            todos los tipos (AlignRule, Role, Assignment, DefenseSnapshot...)
     geometry.ts         medidas del campo, hashes NFHS, OL_SPACING, técnicas
     strength.ts         placeOffense, detectStrength, findReceiver
     zones.ts            resolveZone: elipses + punto de drop
-    align.ts            alignDefense(): el corazón del motor
-    align.test.ts       tests
+    align.ts            alignDefense(): el corazón del motor (alineación, separate(), overrides, man con fallback)
+    align.test.ts       tests: 30 combinaciones × 6 formaciones × 3 hashes
   data/                 contenido de football (lo que más se edita)
     fronts/             un archivo por frente + index.ts (los no listos van con available:false)
     coverages/index.ts  catálogo de covers
     formations/         un archivo por formación + index.ts
-    assignments.ts      matriz frente → cover → jugador → { role, align?, hybrid? }
-    roles.ts            atajos: zone(), man(), RUSH, BLITZ, tech(), apex(), onReceiver(), overBall(), onHash()
+    assignments/        un archivo por frente: cover → jugador → { role, align?, hybrid? }; index.ts arma la matriz
+    roles.ts            atajos: zone(), man(target, ...fallback), RUSH, BLITZ, tech(), apex(), onReceiver(), overBall(), onHash()
     positions.ts        etiquetas editables (short dentro del círculo, name en el panel)
     theme.ts            colores de zonas/roles/campo
-  store/labStore.ts     Zustand: frente, cover, formación, hash, fase, seleccionado
+  store/labStore.ts     Zustand: frente, cover, formación, hash, fase, seleccionado, overrides
+  store/verifyStore.ts  Zustand + persist (localStorage 'db-coach:verify', v1): marcas y notas de Verificar
 ```
 
 ## Reglas de arquitectura
@@ -129,7 +131,7 @@ src/
 - Zonas profundas ancladas al campo (tercios, mitades, cuartos); zonas de abajo ancladas al sideline o al balón. El drop del curl/flat se recorre en el boundary.
 - `OL_SPACING = 2.1` exagera la línea a propósito para que los círculos no se encimen. Las formaciones usan `OL_SPACING` para la OL.
 - Si un frente + cover no tiene asignaciones, se lanza `MissingAssignmentError` y la UI muestra un aviso en vez del diagrama.
-- Todo cover nuevo necesita los 11 jugadores del frente; el test recorre todas las combinaciones disponibles en los 3 hashes.
+- Todo cover nuevo necesita los 11 jugadores del frente; el test recorre las 30 combinaciones contra las 6 formaciones en los 3 hashes y falla si dos defensores quedan encimados.
 
 ## Diseño (antislop en modo DURING)
 Los skills `antislop`, `antislop-layoutmobile`, `frontend-design`, `web-interface-guidelines` y `webapp-testing` se aplican mientras se construye. Cada release se entrega con su reporte PASS/FAIL del Delivery Gate.

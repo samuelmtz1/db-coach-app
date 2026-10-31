@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from 'react'
 import { OptionGroup } from '../../components/ui/OptionGroup'
+import { SnapToggle } from '../../components/ui/SnapToggle'
 import { Legend } from '../../components/field/Legend'
 import { alignDefense, MissingAssignmentError } from '../../engine/align'
-import type { DefenseSnapshot, Hash, Phase } from '../../engine/types'
+import type { DefenseSnapshot, Hash } from '../../engine/types'
 import { ASSIGNMENTS } from '../../data/assignments'
 import { COVERAGES } from '../../data/coverages'
 import { FORMATIONS } from '../../data/formations'
@@ -11,9 +12,13 @@ import { position } from '../../data/positions'
 import { useLabStore } from '../../store/labStore'
 import { Diagram } from './Diagram'
 
-const NEXT = 'Disponible en v1.1.0'
-
 type Result = { ok: true; snap: DefenseSnapshot } | { ok: false; message: string }
+
+export const HASH_OPTIONS: { value: Hash; label: string }[] = [
+  { value: 'L', label: 'Hash izq.' },
+  { value: 'M', label: 'Centro' },
+  { value: 'R', label: 'Hash der.' },
+]
 
 export function CoverageLab() {
   const s = useLabStore()
@@ -23,7 +28,7 @@ export function CoverageLab() {
 
   const result: Result = useMemo(() => {
     try {
-      const snap = alignDefense(front, coverage.id, ASSIGNMENTS[front.id]?.[coverage.id], formation, s.hash)
+      const snap = alignDefense(front, coverage.id, ASSIGNMENTS[front.id]?.[coverage.id], formation, s.hash, s.overrides)
       return { ok: true, snap }
     } catch (e) {
       if (e instanceof MissingAssignmentError) {
@@ -31,7 +36,7 @@ export function CoverageLab() {
       }
       return { ok: false, message: e instanceof Error ? e.message : 'Error desconocido al alinear la defensa.' }
     }
-  }, [front, coverage, formation, s.hash])
+  }, [front, coverage, formation, s.hash, s.overrides])
 
   // Barra espaciadora = snap, para presentar sin tocar la pantalla.
   const togglePhase = s.togglePhase
@@ -47,6 +52,7 @@ export function CoverageLab() {
   }, [togglePhase])
 
   const selected = result.ok ? result.snap.defense.find((d) => d.id === s.selectedId) : undefined
+  const movedCount = Object.keys(s.overrides).length
   const title = `${front.name} · ${coverage.name} vs ${formation.name}`
 
   return (
@@ -56,14 +62,14 @@ export function CoverageLab() {
           label="Frente"
           value={s.frontId}
           onChange={s.setFront}
-          options={FRONTS.map((f) => ({ value: f.id, label: f.name, disabled: !f.available, hint: f.available ? f.personnel : NEXT }))}
-          note={`${front.personnel}. Los demás frentes llegan en v1.1.0.`}
+          options={FRONTS.map((f) => ({ value: f.id, label: f.name, disabled: !f.available, hint: f.personnel }))}
+          note={front.personnel}
         />
         <OptionGroup
           label="Cover"
           value={s.coverageId}
           onChange={s.setCoverage}
-          options={COVERAGES.map((c) => ({ value: c.id, label: c.name.replace('Cover ', 'C'), disabled: !c.available, hint: c.available ? c.summary : NEXT }))}
+          options={COVERAGES.map((c) => ({ value: c.id, label: c.name.replace('Cover ', 'C'), disabled: !c.available, hint: c.summary }))}
           note={coverage.summary}
         />
         <OptionGroup
@@ -71,18 +77,9 @@ export function CoverageLab() {
           value={s.formationId}
           onChange={s.setFormation}
           columns={2}
-          options={FORMATIONS.map((f) => ({ value: f.id, label: f.name, disabled: !f.available, hint: f.available ? undefined : NEXT }))}
+          options={FORMATIONS.map((f) => ({ value: f.id, label: f.name, disabled: !f.available }))}
         />
-        <OptionGroup<Hash>
-          label="Balón en"
-          value={s.hash}
-          onChange={s.setHash}
-          options={[
-            { value: 'L', label: 'Hash izq.' },
-            { value: 'M', label: 'Centro' },
-            { value: 'R', label: 'Hash der.' },
-          ]}
-        />
+        <OptionGroup<Hash> label="Balón en" value={s.hash} onChange={s.setHash} options={HASH_OPTIONS} />
       </aside>
 
       <section className="min-w-0" aria-label="Diagrama">
@@ -96,7 +93,18 @@ export function CoverageLab() {
               </p>
             )}
           </div>
-          <SnapToggle phase={s.phase} onChange={s.setPhase} />
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={s.resetOverrides}
+              disabled={movedCount === 0}
+              title="Regresa a los defensores movidos a su alineación de regla"
+              className="min-h-11 rounded-lg border border-line bg-panel px-4 font-display text-lg font-bold transition-colors hover:border-muted active:bg-line disabled:border-transparent disabled:bg-transparent disabled:text-muted/70"
+            >
+              Reset{movedCount > 0 && ` (${movedCount})`}
+            </button>
+            <SnapToggle phase={s.phase} onChange={s.setPhase} shortcut />
+          </div>
         </div>
 
         {result.ok ? (
@@ -106,6 +114,7 @@ export function CoverageLab() {
               phase={s.phase}
               selectedId={s.selectedId}
               onSelect={(id) => s.select(id === s.selectedId ? null : id)}
+              onMove={s.moveDefender}
               label={`${title}, ${s.phase === 'pre' ? 'pre-snap' : 'post-snap'}`}
             />
           </div>
@@ -120,47 +129,26 @@ export function CoverageLab() {
 
         <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
           <Legend />
-          <p className="min-h-6 text-sm" aria-live="polite">
+          <p className="min-h-6 max-w-xl text-sm" aria-live="polite">
             {selected ? (
               <>
                 <span className="font-display text-base font-bold">{position(selected.pos).name}</span>
                 {selected.hybrid && <span className="text-muted"> (híbrido)</span>}
                 <span className="text-muted"> · </span>
                 {selected.roleLabel}
-                <span className="text-muted"> · alineado a {selected.pre.y.toFixed(0)} yd</span>
+                <span className="text-muted">
+                  {' '}
+                  · {selected.moved ? `movido a mano, a ${selected.pre.y.toFixed(0)} yd` : `${selected.alignLabel}, ${selected.pre.y.toFixed(0)} yd`}
+                </span>
               </>
             ) : (
-              <span className="text-muted">Toca un defensor para ver su responsabilidad.</span>
+              <span className="text-muted">
+                Toca un defensor para ver su responsabilidad. En pre-snap también puedes arrastrarlo: su rol no cambia.
+              </span>
             )}
           </p>
         </div>
       </section>
-    </div>
-  )
-}
-
-function SnapToggle({ phase, onChange }: { phase: Phase; onChange: (p: Phase) => void }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div role="group" aria-label="Momento de la jugada" className="flex rounded-lg border border-line bg-panel p-1">
-        {(['pre', 'post'] as const).map((p) => (
-          <button
-            key={p}
-            type="button"
-            aria-pressed={phase === p}
-            onClick={() => onChange(p)}
-            className={[
-              'min-h-11 rounded-md px-4 font-display text-lg font-bold transition-colors',
-              phase === p ? 'bg-accent text-ink' : 'text-muted hover:text-text',
-            ].join(' ')}
-          >
-            {p === 'pre' ? 'Pre-snap' : 'Post-snap'}
-          </button>
-        ))}
-      </div>
-      <kbd className="hidden rounded border border-line px-1.5 py-0.5 text-xs text-muted [@media(hover:hover)]:inline">
-        Espacio
-      </kbd>
     </div>
   )
 }
