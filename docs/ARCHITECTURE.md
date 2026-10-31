@@ -27,6 +27,18 @@ Los hashes de high school están a 17.78 yd (53'4") de cada sideline. La línea 
 ## Flujo de `alignDefense`
 1. `placeOffense`: ubica a la ofensiva según el hash.
 2. `detectStrength`: lado con más receptores (si empatan, el lado del field) y numeración #1, #2, #3 de afuera hacia adentro.
-3. Para cada defensor del frente: toma su asignación del cover, calcula la alineación pre-snap (`AlignRule`) y su destino post-snap (zona, man, rush o blitz).
+3. Para cada defensor del frente: toma su asignación del cover y calcula la alineación pre-snap (`AlignRule`), con su etiqueta en palabras (`alignLabel`).
+4. `separate`: si dos alineaciones caen encimadas (Bunch, Trips), las abre lo justo (`MIN_GAP`).
+5. Aplica los `overrides` (defensores arrastrados a mano): cambian `pre`, no el rol. `auto` guarda la posición de regla.
+6. Destino post-snap: zona, man, rush o blitz. Un man sin receptor prueba su `fallback` y, si no hay nadie, hace blitz.
+
+## Estado
+- `store/labStore.ts`: tab Coberturas (frente, cover, formación, hash, fase, overrides). No se guarda.
+- `store/verifyStore.ts`: tab Verificar. Se guarda en `localStorage` (`db-coach:verify`, versión 1) con `persist` de Zustand.
+  Cada marca guarda un `snapshot` (rol | alineación | profundidad); si el contenido cambia, la marca queda como "cambió, revísalo otra vez".
+- `features/verify/checklist.ts`: lógica pura de Verificar (tabla, progreso, resumen), con tests.
+
+## Tabs
+`app/App.tsx` lee el tab de la URL (`#coberturas`, `#verificar`).
 
 Versión de la app: `package.json` → `__APP_VERSION__` (definido en `vite.config.ts`) → pie de página.

@@ -1,13 +1,13 @@
 import type { Formation } from '../../engine/types'
+import { bunch } from './bunch'
+import { empty } from './empty'
+import { proI } from './pro-i'
 import { shotgun2x2 } from './shotgun-2x2'
+import { shotgun3x1 } from './shotgun-3x1'
+import { trips } from './trips'
 
-const upcoming = (id: string, name: string): Formation => ({ id, name, available: false, players: [] })
+/** Orden en el que aparecen en el selector. */
+export const FORMATIONS: Formation[] = [shotgun2x2, shotgun3x1, trips, bunch, proI, empty]
 
-export const FORMATIONS: Formation[] = [
-  shotgun2x2,
-  upcoming('shotgun-3x1', 'Shotgun 3x1'),
-  upcoming('trips', 'Trips'),
-  upcoming('bunch', 'Bunch'),
-  upcoming('pro-i', 'Pro / I-Form'),
-  upcoming('empty', 'Empty 3x2'),
-]
+/** Formación contra la que se verifica el contenido (modo Verificar). */
+export const VERIFY_FORMATION_ID = 'shotgun-2x2'

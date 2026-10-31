@@ -20,7 +20,7 @@ export function placeOffense(formation: Formation, hash: Hash): ResolvedOffense[
       const outside = placed.get(p.x.outside)
       if (outside === undefined) throw new Error(`Slot ${p.id} sin receptor ${p.x.outside}`)
       const tackle = bx + sign(p.x.side) * OL_SPACING * 2
-      x = (outside + tackle) / 2
+      x = outside + (tackle - outside) * (p.x.at ?? 0.5)
     }
     placed.set(p.id, x)
   }
@@ -69,13 +69,17 @@ export function detectStrength(offense: ResolvedOffense[], ball: number): Streng
   return { strength, reason, receivers: { L: left, R: right } }
 }
 
-/** Busca un receptor por referencia (S1, W2, RB...). */
+/** Busca un receptor por referencia (S1, W2, RB, FB...). */
 export function findReceiver(
   ref: ReceiverRef,
   result: StrengthResult,
   offense: ResolvedOffense[],
 ): ResolvedOffense | undefined {
-  if (ref === 'RB') return offense.find((p) => p.backfield && p.eligible)
+  if (ref === 'RB' || ref === 'FB') {
+    const backs = offense.filter((p) => p.backfield && p.eligible)
+    const rb = backs.find((p) => p.id === 'RB') ?? backs[0]
+    return ref === 'RB' ? rb : backs.find((p) => p !== rb)
+  }
   const side: Side = ref[0] === 'S' ? result.strength : result.strength === 'R' ? 'L' : 'R'
   return result.receivers[side][Number(ref[1]) - 1]
 }

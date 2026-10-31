@@ -1,7 +1,7 @@
 import { Field } from '../../components/field/Field'
 import { Arrow, ManLine, ZoneLabel, ZoneShape } from '../../components/field/Overlays'
 import { Ball, Defender, Ghost, OffensePlayer } from '../../components/field/Players'
-import type { DefenseSnapshot, Phase } from '../../engine/types'
+import type { DefenseSnapshot, Phase, Point } from '../../engine/types'
 
 interface Props {
   snap: DefenseSnapshot
@@ -9,10 +9,12 @@ interface Props {
   selectedId: string | null
   onSelect: (id: string) => void
   label: string
+  /** Si existe, en pre-snap los defensores se pueden arrastrar. */
+  onMove?: (id: string, to: Point) => void
 }
 
 /** Dibuja ofensiva + defensa. Pre-snap: solo alineación. Post-snap: zonas, drops, man y rush. */
-export function Diagram({ snap, phase, selectedId, onSelect, label }: Props) {
+export function Diagram({ snap, phase, selectedId, onSelect, label, onMove }: Props) {
   const post = phase === 'post'
   const offenseById = new Map(snap.offense.map((p) => [p.id, p]))
   const zones = snap.defense.filter((d) => d.zone)
@@ -26,6 +28,9 @@ export function Diagram({ snap, phase, selectedId, onSelect, label }: Props) {
         <OffensePlayer key={p.id} player={p} />
       ))}
       <Ball at={snap.ball} />
+
+      {/* Pre-snap: la silueta marca dónde lo pone la regla cuando el coach lo movió. */}
+      {!post && snap.defense.filter((d) => d.moved).map((d) => <Ghost key={`g-${d.id}`} at={d.auto} />)}
 
       {post &&
         snap.defense.map((d) => {
@@ -56,6 +61,7 @@ export function Diagram({ snap, phase, selectedId, onSelect, label }: Props) {
           at={post && d.kind === 'zone' ? d.post : d.pre}
           selected={d.id === selectedId}
           onSelect={onSelect}
+          onMove={post ? undefined : onMove}
         />
       ))}
     </Field>

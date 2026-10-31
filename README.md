@@ -5,10 +5,11 @@ Eliges un frente, un cover y una formación ofensiva, y ves la alineación, las 
 
 **App:** https://samuelmtz1.github.io/db-coach-app/
 
-## Qué hay hoy (v1.0.0)
-- Tab **Coberturas**: 4-3-4 + Cover 3 vs Shotgun 2x2, con balón en hash izquierdo, centro o hash derecho.
+## Qué hay hoy (v1.1.0)
+- Tab **Coberturas**: 6 frentes × 5 covers contra 6 formaciones, con balón en hash izquierdo, centro o hash derecho.
 - Toggle **Pre-snap / Post-snap** (también con la barra espaciadora en teclado).
-- Toca un defensor para ver su responsabilidad.
+- Toca un defensor para ver su responsabilidad. En pre-snap lo puedes arrastrar; **Reset** lo regresa.
+- Tab **Verificar**: revisa las 30 combinaciones defensor por defensor y copia un resumen para pedir correcciones.
 
 Lo que viene está en [CHANGELOG.md](CHANGELOG.md) y en el plan de versiones de [docs/SOP.md](docs/SOP.md).
 

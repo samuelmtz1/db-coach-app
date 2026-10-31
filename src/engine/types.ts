@@ -20,8 +20,11 @@ export type OffXRef =
   | { from: 'ball'; dx: number }
   /** A `d` yardas del sideline. Para receptores abiertos. */
   | { from: 'sideline'; side: Side; d: number }
-  /** A medio camino entre el receptor `outside` y el tackle de ese lado. Para slots. */
-  | { from: 'slot'; side: Side; outside: string }
+  /**
+   * Entre el receptor `outside` y el tackle de ese lado. Para slots.
+   * `at` = fracción del camino desde el receptor hacia el tackle (0.5 si falta).
+   */
+  | { from: 'slot'; side: Side; outside: string; at?: number }
 
 export interface OffensivePlayer {
   id: string
@@ -47,8 +50,11 @@ export interface Formation {
 
 export type Group = 'DL' | 'LB' | 'DB'
 
-/** Receptor por lado y número de afuera hacia adentro: S1 = #1 del lado strong. */
-export type ReceiverRef = 'S1' | 'S2' | 'S3' | 'W1' | 'W2' | 'W3' | 'RB'
+/**
+ * Receptor por lado y número de afuera hacia adentro: S1 = #1 del lado strong.
+ * RB = corredor (o el primer back elegible); FB = el segundo back elegible (I-Form).
+ */
+export type ReceiverRef = 'S1' | 'S2' | 'S3' | 'W1' | 'W2' | 'W3' | 'RB' | 'FB'
 
 export type AlignRule =
   /** Técnica de DL/LB relativa a la OL (0 = cabeza del centro, 5 = hombro externo del tackle...). */
@@ -101,7 +107,8 @@ export interface ZoneSpec {
 
 export type Role =
   | { kind: 'zone'; zone: ZoneSpec }
-  | { kind: 'man'; target: ReceiverRef }
+  /** Si `target` no existe en la formación, prueba `fallback` en orden; si ninguno existe, hace blitz. */
+  | { kind: 'man'; target: ReceiverRef; fallback?: ReceiverRef[] }
   | { kind: 'rush' }
   | { kind: 'blitz' }
 
@@ -120,6 +127,9 @@ export interface Coverage {
   summary: string
   available: boolean
 }
+
+/** Posiciones pre-snap movidas a mano: id del defensor → punto. */
+export type Overrides = Record<string, Point>
 
 /** frente → cover → id del jugador del frente → asignación */
 export type AssignmentMatrix = Record<string, Record<string, Record<string, Assignment>>>
@@ -151,10 +161,16 @@ export interface ResolvedDefender {
   id: string
   pos: string
   group: Group
+  /** Alineación pre-snap (con el override, si lo movieron a mano). */
   pre: Point
+  /** Alineación que da la regla, sin override. */
+  auto: Point
+  moved: boolean
   post: Point
   kind: RoleKind
   roleLabel: string
+  /** Regla de alineación en palabras: "Apex strong", "Sobre el #1 weak, 1 yd por fuera"... */
+  alignLabel: string
   zone?: ResolvedZone
   /** id del jugador ofensivo cubierto en man. */
   manTargetId?: string

@@ -1,20 +1,10 @@
 import type { Front } from '../../engine/types'
+import { front335 } from './3-3-5'
+import { front344 } from './3-4-4'
+import { front353 } from './3-5-3'
+import { front425 } from './4-2-5'
 import { front434 } from './4-3-4'
-
-const upcoming = (id: string, personnel: string): Front => ({
-  id,
-  name: id,
-  personnel,
-  available: false,
-  players: [],
-})
+import { front533 } from './5-3-3'
 
 /** Orden en el que aparecen en el selector. */
-export const FRONTS: Front[] = [
-  front434,
-  upcoming('3-4-4', '3 DL · 4 LB · 4 DB'),
-  upcoming('4-2-5', '4 DL · 2 LB · 5 DB'),
-  upcoming('3-3-5', '3 DL · 3 LB · 5 DB'),
-  upcoming('3-5-3', '3 DL · 5 LB · 3 DB'),
-  upcoming('5-3-3', '5 DL · 3 LB · 3 DB'),
-]
+export const FRONTS: Front[] = [front434, front344, front425, front335, front353, front533]

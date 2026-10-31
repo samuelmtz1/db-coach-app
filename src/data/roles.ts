@@ -9,7 +9,12 @@ export const zone = (type: ZoneSpec['type'], side: ZoneSpec['side'], slot?: Zone
   zone: { type, side, slot },
 })
 
-export const man = (target: ReceiverRef): Role => ({ kind: 'man', target })
+/** man('W2', 'FB'): man sobre el #2 weak; si no hay #2 weak, sobre el FB; si tampoco, blitz. */
+export const man = (target: ReceiverRef, ...fallback: ReceiverRef[]): Role => ({
+  kind: 'man',
+  target,
+  fallback: fallback.length ? fallback : undefined,
+})
 
 // Reglas de alineación
 export const onReceiver = (rec: ReceiverRef, leverage: number, depth: number): AlignRule => ({

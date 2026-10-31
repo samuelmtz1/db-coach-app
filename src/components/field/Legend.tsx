@@ -1,4 +1,4 @@
-import { ROLE_COLORS, ZONE_COLORS } from '../../data/theme'
+import { FIELD_COLORS, ROLE_COLORS, ZONE_COLORS } from '../../data/theme'
 
 const ITEMS = [
   { label: 'Deep', color: ZONE_COLORS.deep, shape: 'zone' },
@@ -27,7 +27,13 @@ export function Legend() {
         </li>
       ))}
       <li className="flex items-center gap-2">
-        <span className="inline-block h-4 w-4 rounded-full border border-dashed border-white" aria-hidden="true" />
+        <span
+          className="inline-grid h-5 w-5 place-items-center rounded-full border-2 border-dashed bg-[#0f1724] font-display text-[0.7rem] font-bold leading-none"
+          style={{ borderColor: ZONE_COLORS.deep, color: FIELD_COLORS.hybridText }}
+          aria-hidden="true"
+        >
+          SP
+        </span>
         Híbrido (LB en rol de DB)
       </li>
     </ul>
