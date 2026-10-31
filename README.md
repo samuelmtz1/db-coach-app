@@ -23,6 +23,7 @@ npm run build    # build de producción en dist/
 ```
 
 ## Documentación
+- [CLAUDE.md](CLAUDE.md): contexto completo del proyecto para sesiones de Claude.
 - [docs/SOP.md](docs/SOP.md): procedimientos de contenido, desarrollo, release y uso en práctica.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): cómo está organizado el código.
 - [docs/CONTENT-GUIDE.md](docs/CONTENT-GUIDE.md): cómo agregar o corregir frentes, covers y formaciones.

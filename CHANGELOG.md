@@ -5,6 +5,12 @@ Todas las versiones siguen [SemVer](https://semver.org/lang/es/): `MAYOR.MENOR.P
 - **MENOR**: funcionalidad nueva compatible (tab, frente, cover, formación).
 - **MAYOR**: cambios que rompen lo anterior (p. ej. formato de jugadas guardadas).
 
+## [1.0.1] - 2026-10-30
+### Agregado
+- `CLAUDE.md`: overview, layout, decisiones, roadmap y entorno del proyecto, para continuar en sesiones nuevas sin perder contexto.
+### Cambiado
+- SOP: ramas `release/X.Y.Z` para agrupar el trabajo de cada versión.
+
 ## [1.0.0] - 2026-10-30
 ### Agregado
 - Campo vertical estilo transmisión: hashes de high school (NFHS), números, LOS.
@@ -16,4 +22,5 @@ Todas las versiones siguen [SemVer](https://semver.org/lang/es/): `MAYOR.MENOR.P
 - Panel de responsabilidad al tocar un defensor.
 - Deploy automático a GitHub Pages.
 
+[1.0.1]: https://github.com/samuelmtz1/db-coach-app/releases/tag/v1.0.1
 [1.0.0]: https://github.com/samuelmtz1/db-coach-app/releases/tag/v1.0.0
