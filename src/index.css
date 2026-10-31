@@ -1,0 +1,64 @@
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/500.css';
+@import '@fontsource/barlow/600.css';
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/barlow-condensed/700.css';
+@import 'tailwindcss';
+
+/* Barlow Condensed: la tipografía condensada de gráficos de transmisión deportiva.
+   Barlow: la misma familia en ancho normal, legible en textos de panel. */
+@theme {
+  --color-ink: #0d1117;
+  --color-panel: #161b22;
+  --color-panel-2: #1f2630;
+  --color-line: #2d3540;
+  --color-text: #e6edf3;
+  --color-muted: #9ba6b4;
+  --color-accent: #ffd23f;
+  --font-display: 'Barlow Condensed', system-ui, sans-serif;
+  --font-body: 'Barlow', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    background: var(--color-ink);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  [role='button'] {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/* Transición pre-snap → post-snap: muestra el recorrido del defensor a su zona. */
+.player-move {
+  transition: transform 450ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.fade-in {
+  animation: fade-in 350ms ease-out both;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .player-move {
+    transition: none;
+  }
+  .fade-in {
+    animation: none;
+  }
+}
