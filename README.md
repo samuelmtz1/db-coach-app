@@ -1,5 +1,7 @@
 # DB Coach
 
+> **English summary:** DB Coach teaches cornerbacks and safeties to read and adjust to coverages. Choose a front, a coverage and an offensive formation to see alignments, zones and assignments. I use it to teach my players. I built it with Claude Code: I defined the product and the football rules and reviewed the results. [Open the app](https://samuelmtz1.github.io/db-coach-app/). The interface is in Spanish.
+
 Herramienta para enseñar a corners y safeties a leer, identificar y ajustar coberturas.
 Eliges un frente, un cover y una formación ofensiva, y ves la alineación, las zonas y las asignaciones estilo Madden.
 
