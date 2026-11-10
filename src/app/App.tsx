@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react'
+import { ComparePage } from '../features/compare/ComparePage'
 import { CoverageLab } from '../features/coverage-lab/CoverageLab'
 import { VerifyMode } from '../features/verify/VerifyMode'
 
-type Route = 'coberturas' | 'verificar'
+type Route = 'coberturas' | 'comparar' | 'verificar'
 
 const TABS = [
   { id: 'coberturas', label: 'Coberturas', ready: true },
+  { id: 'comparar', label: 'Comparar', ready: true },
   { id: 'verificar', label: 'Verificar', ready: true },
-  { id: 'compare', label: 'Comparar', ready: false },
   { id: 'whiteboard', label: 'Whiteboard', ready: false },
 ] as const
 
-/** El tab vive en la URL (#verificar) para que recargar o compartir el link abra el mismo tab. */
+const ROUTES: Route[] = ['coberturas', 'comparar', 'verificar']
+
+/** El tab vive en la URL (#comparar) para que recargar o compartir el link abra el mismo tab. */
 function useRoute(): Route {
-  const read = (): Route => (window.location.hash === '#verificar' ? 'verificar' : 'coberturas')
+  const read = (): Route => ROUTES.find((r) => window.location.hash === `#${r}`) ?? 'coberturas'
   const [route, setRoute] = useState<Route>(read)
   useEffect(() => {
     const onHash = () => {
@@ -65,7 +68,7 @@ export function App() {
       </header>
 
       <main className="mx-auto w-full max-w-[110rem] flex-1 px-4 py-4 sm:px-6">
-        {route === 'verificar' ? <VerifyMode /> : <CoverageLab />}
+        {route === 'verificar' ? <VerifyMode /> : route === 'comparar' ? <ComparePage /> : <CoverageLab />}
       </main>
 
       <footer className="px-4 py-3 text-center text-xs text-muted sm:px-6">DB Coach v{__APP_VERSION__}</footer>

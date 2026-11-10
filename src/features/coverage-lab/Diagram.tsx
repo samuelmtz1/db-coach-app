@@ -11,18 +11,33 @@ interface Props {
   label: string
   /** Si existe, en pre-snap los defensores se pueden arrastrar. */
   onMove?: (id: string, to: Point) => void
+  /**
+   * Modo Comparar: los defensores de este set quedan resaltados y el resto se atenúa
+   * (con sus zonas y flechas). Sin este prop, todos se ven igual.
+   */
+  highlight?: Set<string>
 }
 
+/** Opacidad de lo que no cambia cuando hay resaltado. */
+const DIMMED = 0.28
+
 /** Dibuja ofensiva + defensa. Pre-snap: solo alineación. Post-snap: zonas, drops, man y rush. */
-export function Diagram({ snap, phase, selectedId, onSelect, label, onMove }: Props) {
+export function Diagram({ snap, phase, selectedId, onSelect, label, onMove, highlight }: Props) {
   const post = phase === 'post'
   const offenseById = new Map(snap.offense.map((p) => [p.id, p]))
-  const zones = snap.defense.filter((d) => d.zone)
+  // Las zonas resaltadas se pintan al final para que queden encima de las atenuadas.
+  const dimmed = (id: string) => Boolean(highlight && !highlight.has(id))
+  const zones = snap.defense.filter((d) => d.zone).sort((a, b) => Number(dimmed(b.id)) - Number(dimmed(a.id)))
+  const op = (id: string) => (dimmed(id) ? DIMMED : undefined)
 
   return (
     <Field label={label}>
       {post &&
-        zones.map((d) => <ZoneShape key={`z-${d.id}`} zone={d.zone!} highlighted={d.id === selectedId} />)}
+        zones.map((d) => (
+          <g key={`z-${d.id}`} opacity={op(d.id)}>
+            <ZoneShape zone={d.zone!} highlighted={d.id === selectedId} />
+          </g>
+        ))}
 
       {snap.offense.map((p) => (
         <OffensePlayer key={p.id} player={p} />
@@ -36,7 +51,7 @@ export function Diagram({ snap, phase, selectedId, onSelect, label, onMove }: Pr
         snap.defense.map((d) => {
           if (d.kind === 'zone') {
             return (
-              <g key={`a-${d.id}`}>
+              <g key={`a-${d.id}`} opacity={op(d.id)}>
                 <Ghost at={d.pre} />
                 <Arrow from={d.pre} to={d.post} kind="drop" />
               </g>
@@ -44,15 +59,28 @@ export function Diagram({ snap, phase, selectedId, onSelect, label, onMove }: Pr
           }
           if (d.kind === 'man' && d.manTargetId) {
             const target = offenseById.get(d.manTargetId)
-            return target ? <ManLine key={`m-${d.id}`} from={d.pre} to={target.pos} /> : null
+            return target ? (
+              <g key={`m-${d.id}`} opacity={op(d.id)}>
+                <ManLine from={d.pre} to={target.pos} />
+              </g>
+            ) : null
           }
           if (d.kind === 'rush' || d.kind === 'blitz') {
-            return <Arrow key={`r-${d.id}`} from={d.pre} to={d.post} kind={d.kind} />
+            return (
+              <g key={`r-${d.id}`} opacity={op(d.id)}>
+                <Arrow from={d.pre} to={d.post} kind={d.kind} />
+              </g>
+            )
           }
           return null
         })}
 
-      {post && zones.map((d) => <ZoneLabel key={`l-${d.id}`} zone={d.zone!} />)}
+      {post &&
+        zones.map((d) => (
+          <g key={`l-${d.id}`} opacity={op(d.id)}>
+            <ZoneLabel zone={d.zone!} />
+          </g>
+        ))}
 
       {snap.defense.map((d) => (
         <Defender
@@ -60,6 +88,8 @@ export function Diagram({ snap, phase, selectedId, onSelect, label, onMove }: Pr
           d={d}
           at={post && d.kind === 'zone' ? d.post : d.pre}
           selected={d.id === selectedId}
+          dimmed={dimmed(d.id)}
+          marked={Boolean(highlight?.has(d.id))}
           onSelect={onSelect}
           onMove={post ? undefined : onMove}
         />

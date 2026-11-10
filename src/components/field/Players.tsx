@@ -45,12 +45,16 @@ interface DefenderProps {
   d: ResolvedDefender
   at: Point
   selected: boolean
+  /** Comparar: no cambia respecto al otro campo, se ve atenuado. */
+  dimmed?: boolean
+  /** Comparar: cambia respecto al otro campo, lleva un halo blanco. */
+  marked?: boolean
   onSelect: (id: string) => void
   /** Si existe, el defensor se puede arrastrar con el dedo o el mouse, y mover con las flechas. */
   onMove?: (id: string, to: Point) => void
 }
 
-export function Defender({ d, at, selected, onSelect, onMove }: DefenderProps) {
+export function Defender({ d, at, selected, dimmed = false, marked = false, onSelect, onMove }: DefenderProps) {
   const color = colorFor(d.kind, d.zone?.family)
   const pos = position(d.pos)
   const ref = useRef<SVGGElement>(null)
@@ -129,7 +133,7 @@ export function Defender({ d, at, selected, onSelect, onMove }: DefenderProps) {
     <g
       ref={ref}
       className={['player-move outline-none', onMove && 'draggable', dragging && 'is-dragging'].filter(Boolean).join(' ')}
-      style={{ transform: `translate(${at.x}px, ${sy(at.y)}px)` }}
+      style={{ transform: `translate(${at.x}px, ${sy(at.y)}px)`, opacity: dimmed ? 0.35 : undefined }}
       role="button"
       tabIndex={0}
       aria-pressed={selected}
@@ -143,7 +147,8 @@ export function Defender({ d, at, selected, onSelect, onMove }: DefenderProps) {
     >
       {/* Área táctil más grande que el círculo visible. */}
       <circle r={2} fill="transparent" />
-      {selected && <circle r={R + 0.6} fill="none" stroke={FIELD_COLORS.selected} strokeWidth={0.22} />}
+      {marked && <circle r={R + 0.45} fill="none" stroke={FIELD_COLORS.changed} strokeWidth={0.2} />}
+      {selected && <circle r={R + (marked ? 0.9 : 0.6)} fill="none" stroke={FIELD_COLORS.selected} strokeWidth={0.22} />}
       <circle
         r={R}
         fill={FIELD_COLORS.defense}

@@ -24,3 +24,15 @@ export const POSITIONS: Record<string, Position> = {
 export function position(id: string): Position {
   return POSITIONS[id] ?? { short: id, name: id }
 }
+
+const sideSuffix = (id: string) => (id.endsWith('_S') ? ' strong' : id.endsWith('_W') ? ' weak' : '')
+
+/** Nombre de un defensor del frente: "Cornerback strong", "Mike". El sufijo _S / _W del id da el lado. */
+export function defenderName(id: string, pos: string): string {
+  return `${position(pos).name}${sideSuffix(id)}`
+}
+
+/** Versión corta: "DE strong", "M". */
+export function defenderShort(id: string, pos: string): string {
+  return `${position(pos).short}${sideSuffix(id)}`
+}

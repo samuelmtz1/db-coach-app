@@ -20,6 +20,8 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 - **Revisión de Samuel a v1.0.0:** aprobó el menú (espaciado, colores, tipografía), el campo, el pre/post-snap y los cambios de hash.
 - **v1.0.1 publicada** (2026-10-30): `CLAUDE.md` y ramas `release/`. Merge en `main` vía PR #1. Falta el tag `v1.0.1`.
 - **v1.1.0 construida** (2026-10-31) en la rama `release/1.1.0`: 30 combinaciones, 6 formaciones, arrastrar con Reset y tab Verificar. Falta el merge a `main` y el tag `v1.1.0`. Convenciones estándar elegidas sin el PDF: ver `docs/CONTENT-GUIDE.md`, sección "Convenciones de esta versión".
+- **v1.2.0 construida** (2026-11-10) en la rama `release/1.2.0` (sale de `release/1.1.0`): tab Comparar. Samuel pidió saltar la revisión de Verificar por ahora e ir a Comparar y Whiteboard.
+- **Ramas (decisión de Samuel, 2026-11-10):** cada versión tiene su rama `release/X.Y.Z` y se hace merge a `main` cuando termina de construirse; la siguiente versión sale de `main`.
 - **Pendiente de Samuel:**
   - Revisar las 30 combinaciones en el modo Verificar cuando salga v1.1.0, incluida la Cover 3 de v1.0.0.
   - Su documento o PDF con frentes y covers, si lo consigue. No bloquea nada: entra como parches 1.1.x.
@@ -31,7 +33,7 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 | v1.0.1 | CLAUDE.md, convención de ramas `release/` | ✅ |
 | v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | ✅ construida, falta merge |
 | v1.1.x | Correcciones de Samuel desde el modo Verificar | |
-| v1.2.0 | **Comparar**: dos campos lado a lado con los cambios de rol resaltados (`engine/diff.ts`) | |
+| v1.2.0 | **Comparar**: dos campos lado a lado con los cambios de rol resaltados (`engine/diff.ts`) | ✅ construida |
 | v1.3.0 | **Whiteboard** | |
 | v1.4.0 | Biblioteca de jugadas (guardado manual, `localStorage`, `schemaVersion`), exportar PNG con Web Share, PWA offline | |
 | v2.0.0 | Animación snap → rutas → drops | |
@@ -62,6 +64,11 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
   - Se verifica contra **Shotgun 2x2 con balón al centro**; la nota guarda qué formación estaba viendo.
   - Cada fila se marca ✔ OK o ✘ Corregir, con nota. El estado se guarda en el dispositivo (`localStorage`).
   - Botón "Copiar resumen" genera texto para pegar en el chat.
+
+**v1.2.0, Comparar (decisiones 2026-11-10):**
+- Se compara **una cosa a la vez**: Cover, Formación, Frente o Hash. Lo demás es igual en los dos campos (selectores "A y B").
+- Halo blanco = cambia; lo que no cambia se atenúa (botón "Resaltar cambios"). Lista "Qué cambia" debajo de los campos.
+- Pre/post-snap, barra espaciadora y selección compartidos entre los dos campos. Sin arrastre.
 
 **v1.3.0, Whiteboard:**
 - Más uso en vivo que preparado.
@@ -95,16 +102,19 @@ docs/CONTENT-GUIDE.md   cómo editar frentes/covers/formaciones (atajos de roles
 docs/source/            documentos/PDFs del coach (fuente de verdad)
 .github/workflows/deploy.yml   push a main → test + build + deploy a GitHub Pages
 src/
-  app/App.tsx           header, tabs por URL (#coberturas, #verificar; Comparar/Whiteboard "Próximamente"), footer
+  app/App.tsx           header, tabs por URL (#coberturas, #comparar, #verificar; Whiteboard "Próximamente"), footer
   features/coverage-lab/  CoverageLab.tsx (controles + estados), Diagram.tsx (capas del campo, arrastre)
+  features/compare/     ComparePage.tsx (situación, dos campos, lista Qué cambia), compare.ts (dimensiones y opciones)
+  features/shared/      solve.ts: situación → alignDefense → SolveResult (con aviso si falta la combinación)
   features/verify/      VerifyMode.tsx (matriz, diagrama, lista), checklist.ts (+ test): tabla, progreso, resumen
   components/field/     Field.tsx (campo SVG), Players.tsx, Overlays.tsx (zonas, flechas, man), Legend.tsx
-  components/ui/        OptionGroup.tsx (botones tipo radio, 44px mínimo), SnapToggle.tsx
+  components/ui/        OptionGroup.tsx (botones tipo radio, 44px mínimo), SelectField.tsx, SnapToggle.tsx, useSnapShortcut.ts
   engine/               lógica pura, sin React
     types.ts            todos los tipos (AlignRule, Role, Assignment, DefenseSnapshot...)
     geometry.ts         medidas del campo, hashes NFHS, OL_SPACING, técnicas
     strength.ts         placeOffense, detectStrength, findReceiver
     zones.ts            resolveZone: elipses + punto de drop
+    diff.ts             diffSnapshots: qué cambia entre dos defensas (+ test)
     align.ts            alignDefense(): el corazón del motor (alineación, separate(), overrides, man con fallback)
     align.test.ts       tests: 30 combinaciones × 6 formaciones × 3 hashes
   data/                 contenido de football (lo que más se edita)
@@ -116,6 +126,7 @@ src/
     positions.ts        etiquetas editables (short dentro del círculo, name en el panel)
     theme.ts            colores de zonas/roles/campo
   store/labStore.ts     Zustand: frente, cover, formación, hash, fase, seleccionado, overrides
+  store/compareStore.ts Zustand: qué cambia, situación base, A, B, fase, seleccionado
   store/verifyStore.ts  Zustand + persist (localStorage 'db-coach:verify', v1): marcas y notas de Verificar
 ```
 
@@ -168,6 +179,7 @@ Los skills `antislop`, `antislop-layoutmobile`, `frontend-design`, `web-interfac
   - Hacer click-through de cada control.
 
 ## Entorno (Mac de Samuel)
+- La ruta del proyecto tiene `:` ("APPS : WEB") y eso rompe el PATH que arma `npx`/`npm run` para `node_modules/.bin`. Si un binario "no se encuentra", llámalo directo: `node node_modules/vitest/vitest.mjs run`, `node node_modules/typescript/bin/tsc -b`, `node node_modules/eslint/bin/eslint.js .`, `node node_modules/vite/bin/vite.js build|preview`.
 - macOS 13 Intel: Homebrew no funciona aquí (Tier 3). **Node 22** está instalado desde nodejs.org en `~/.local/node` y **no está en el PATH** de los shells no interactivos: antepón `export PATH="$HOME/.local/node/bin:$PATH"`.
 - No hay `gh`. `git push` funciona con la credencial de GitHub de VS Code. GitHub Pages ya está activado con el source "GitHub Actions".
 - Verificación visual: instala `playwright-core` en el scratchpad (no en el proyecto) y lánzalo con `chromium.launch({ channel: 'chrome' })`.

@@ -1,18 +1,16 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { OptionGroup } from '../../components/ui/OptionGroup'
 import { SnapToggle } from '../../components/ui/SnapToggle'
+import { useSnapShortcut } from '../../components/ui/useSnapShortcut'
 import { Legend } from '../../components/field/Legend'
-import { alignDefense, MissingAssignmentError } from '../../engine/align'
-import type { DefenseSnapshot, Hash } from '../../engine/types'
-import { ASSIGNMENTS } from '../../data/assignments'
+import type { Hash } from '../../engine/types'
 import { COVERAGES } from '../../data/coverages'
 import { FORMATIONS } from '../../data/formations'
 import { FRONTS } from '../../data/fronts'
 import { position } from '../../data/positions'
 import { useLabStore } from '../../store/labStore'
+import { solve } from '../shared/solve'
 import { Diagram } from './Diagram'
-
-type Result = { ok: true; snap: DefenseSnapshot } | { ok: false; message: string }
 
 export const HASH_OPTIONS: { value: Hash; label: string }[] = [
   { value: 'L', label: 'Hash izq.' },
@@ -26,30 +24,12 @@ export function CoverageLab() {
   const coverage = COVERAGES.find((c) => c.id === s.coverageId)!
   const formation = FORMATIONS.find((f) => f.id === s.formationId)!
 
-  const result: Result = useMemo(() => {
-    try {
-      const snap = alignDefense(front, coverage.id, ASSIGNMENTS[front.id]?.[coverage.id], formation, s.hash, s.overrides)
-      return { ok: true, snap }
-    } catch (e) {
-      if (e instanceof MissingAssignmentError) {
-        return { ok: false, message: `${front.name} + ${coverage.name} todavía no está cargado.` }
-      }
-      return { ok: false, message: e instanceof Error ? e.message : 'Error desconocido al alinear la defensa.' }
-    }
-  }, [front, coverage, formation, s.hash, s.overrides])
+  const result = useMemo(
+    () => solve({ frontId: s.frontId, coverageId: s.coverageId, formationId: s.formationId, hash: s.hash }, s.overrides),
+    [s.frontId, s.coverageId, s.formationId, s.hash, s.overrides],
+  )
 
-  // Barra espaciadora = snap, para presentar sin tocar la pantalla.
-  const togglePhase = s.togglePhase
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && e.target === document.body) {
-        e.preventDefault()
-        togglePhase()
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [togglePhase])
+  useSnapShortcut(s.togglePhase)
 
   const selected = result.ok ? result.snap.defense.find((d) => d.id === s.selectedId) : undefined
   const movedCount = Object.keys(s.overrides).length
