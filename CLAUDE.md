@@ -21,9 +21,11 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 - **v1.0.1 publicada** (2026-10-30): `CLAUDE.md` y ramas `release/`. Merge en `main` vía PR #1 (sin tag).
 - **v1.1.0 publicada** (2026-10-31): 30 combinaciones, 6 formaciones, arrastrar con Reset y tab Verificar. Merge en `main` (`10bcb41`), tag `v1.1.0` puesto el 2026-11-10. Convenciones estándar elegidas sin el PDF: ver `docs/CONTENT-GUIDE.md`, sección "Convenciones de esta versión".
 - **v1.2.0 publicada** (2026-11-10): tab Comparar. Rama `release/1.2.0`, merge en `main` y tag `v1.2.0`. Samuel pidió saltar la revisión de Verificar por ahora e ir a Comparar y Whiteboard.
+- **v1.3.0 publicada** (2026-11-10): tab Whiteboard. Rama `release/1.3.0`, merge en `main` y tag `v1.3.0`.
 - **Ramas (decisión de Samuel, 2026-11-10):** cada versión tiene su rama `release/X.Y.Z` y se hace merge a `main` cuando termina de construirse; la siguiente versión sale de `main`.
 - **Pendiente de Samuel:**
-  - Revisar las 30 combinaciones en el modo Verificar cuando salga v1.1.0, incluida la Cover 3 de v1.0.0.
+  - Revisar Comparar y Whiteboard en iPad/TV.
+  - Revisar las 30 combinaciones en el modo Verificar (pospuesto por él el 2026-11-10), incluida la Cover 3 de v1.0.0.
   - Su documento o PDF con frentes y covers, si lo consigue. No bloquea nada: entra como parches 1.1.x.
 
 ## Roadmap (SemVer, una versión menor por milestone)
@@ -34,7 +36,7 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 | v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | ✅ |
 | v1.1.x | Correcciones de Samuel desde el modo Verificar | |
 | v1.2.0 | **Comparar**: dos campos lado a lado con los cambios de rol resaltados (`engine/diff.ts`) | ✅ |
-| v1.3.0 | **Whiteboard** | |
+| v1.3.0 | **Whiteboard** | ✅ |
 | v1.4.0 | Biblioteca de jugadas (guardado manual, `localStorage`, `schemaVersion`), exportar PNG con Web Share, PWA offline | |
 | v2.0.0 | Animación snap → rutas → drops | |
 
@@ -70,7 +72,7 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 - Halo blanco = cambia; lo que no cambia se atenúa (botón "Resaltar cambios"). Lista "Qué cambia" debajo de los campos.
 - Pre/post-snap, barra espaciadora y selección compartidos entre los dos campos. Sin arrastre.
 
-**v1.3.0, Whiteboard:**
+**v1.3.0, Whiteboard (construido 2026-11-10):**
 - Más uso en vivo que preparado.
 - Plantillas de formación y jugadores ofensivos arrastrables.
 - Menú con 12 rutas: slant, out, go, fade, post, curl, flat, wheel, screen, checkdown, dig, comeback. También se pueden dibujar punto por punto.
@@ -78,6 +80,7 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 - Lápiz libre, borrador, deshacer/rehacer.
 - Overlay de frente + cover que se recalcula al mover receptores. Toggle para mostrar u ocultar la defensa.
 - Solo formación + concepto de ruta, sin profundidades exactas.
+- Decisiones de la construcción: la pizarra actual **se guarda sola** en el dispositivo (decisión de Samuel); la biblioteca con varias jugadas sigue en v1.4.0. Herramientas: Mover, Ruta a mano, Lápiz, Borrador. "Marcar pre-snap" deja el círculo punteado y la línea punteada del motion sigue al jugador. El estilo sólida/punteada aplica a lo siguiente que dibujes y a la ruta del jugador elegido. Elegir una plantilla borra rutas y motion; cambiar el hash recorre todo con el balón. Un elegible dentro de la caja y detrás de la línea cuenta como back.
 
 **Fuera de alcance por ahora:** motion animado, shifts, substituciones (Samuel los simula con líneas punteadas), login/nube, tarjetas de reglas por posición, variantes de cover (Sky/Buzz/Cloud, Tampa 2...), pattern match.
 
@@ -102,9 +105,10 @@ docs/CONTENT-GUIDE.md   cómo editar frentes/covers/formaciones (atajos de roles
 docs/source/            documentos/PDFs del coach (fuente de verdad)
 .github/workflows/deploy.yml   push a main → test + build + deploy a GitHub Pages
 src/
-  app/App.tsx           header, tabs por URL (#coberturas, #comparar, #verificar; Whiteboard "Próximamente"), footer
+  app/App.tsx           header, tabs por URL (#coberturas, #comparar, #whiteboard, #verificar), footer
   features/coverage-lab/  CoverageLab.tsx (controles + estados), Diagram.tsx (capas del campo, arrastre)
   features/compare/     ComparePage.tsx (situación, dos campos, lista Qué cambia), compare.ts (dimensiones y opciones)
+  features/whiteboard/  Whiteboard.tsx (herramientas, configuración, menú de rutas), BoardCanvas.tsx (campo, arrastre, lápiz, borrador)
   features/shared/      solve.ts: situación → alignDefense → SolveResult (con aviso si falta la combinación)
   features/verify/      VerifyMode.tsx (matriz, diagrama, lista), checklist.ts (+ test): tabla, progreso, resumen
   components/field/     Field.tsx (campo SVG), Players.tsx, Overlays.tsx (zonas, flechas, man), Legend.tsx
@@ -115,18 +119,21 @@ src/
     strength.ts         placeOffense, detectStrength, findReceiver
     zones.ts            resolveZone: elipses + punto de drop
     diff.ts             diffSnapshots: qué cambia entre dos defensas (+ test)
-    align.ts            alignDefense(): el corazón del motor (alineación, separate(), overrides, man con fallback)
+    board.ts            whiteboard: resolveBoardOffense (quién es back), routeOffsets, borrador (+ test)
+    align.ts            alignDefense() / alignAgainst(): el corazón del motor (alineación, separate(), overrides, man con fallback)
     align.test.ts       tests: 30 combinaciones × 6 formaciones × 3 hashes
   data/                 contenido de football (lo que más se edita)
     fronts/             un archivo por frente + index.ts (los no listos van con available:false)
     coverages/index.ts  catálogo de covers
     formations/         un archivo por formación + index.ts
     assignments/        un archivo por frente: cover → jugador → { role, align?, hybrid? }; index.ts arma la matriz
+    routes.ts           las 12 rutas del whiteboard ([dx, y], versión backfield)
     roles.ts            atajos: zone(), man(target, ...fallback), RUSH, BLITZ, tech(), apex(), onReceiver(), overBall(), onHash()
     positions.ts        etiquetas editables (short dentro del círculo, name en el panel)
     theme.ts            colores de zonas/roles/campo
   store/labStore.ts     Zustand: frente, cover, formación, hash, fase, seleccionado, overrides
   store/compareStore.ts Zustand: qué cambia, situación base, A, B, fase, seleccionado
+  store/boardStore.ts   Zustand + persist (localStorage 'db-coach:whiteboard', v1): pizarra, historial deshacer/rehacer, herramientas
   store/verifyStore.ts  Zustand + persist (localStorage 'db-coach:verify', v1): marcas y notas de Verificar
 ```
 

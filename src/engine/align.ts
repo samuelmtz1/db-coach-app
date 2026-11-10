@@ -176,11 +176,24 @@ export function alignDefense(
   hash: Hash,
   overrides: Overrides = {},
 ): DefenseSnapshot {
+  return alignAgainst(front, coverageId, assignments, placeOffense(formation, hash), hashToBallX(hash), overrides)
+}
+
+/**
+ * Igual que `alignDefense`, pero contra una ofensiva ya colocada (p. ej. la del whiteboard,
+ * donde el coach arrastra a los receptores). `ball` = x del balón.
+ */
+export function alignAgainst(
+  front: Front,
+  coverageId: string,
+  assignments: Record<string, Assignment> | undefined,
+  offense: ResolvedOffense[],
+  ball: number,
+  overrides: Overrides = {},
+): DefenseSnapshot {
   if (!assignments) {
     throw new MissingAssignmentError(`Sin asignaciones para ${front.name} + ${coverageId}`)
   }
-  const ball = hashToBallX(hash)
-  const offense = placeOffense(formation, hash)
   const str = detectStrength(offense, ball)
   const qbPlayer = offense.find((p) => p.backfield && !p.eligible)
   const ctx: Ctx = { ball, str, offense, qb: qbPlayer?.pos ?? { x: ball, y: -5 } }
