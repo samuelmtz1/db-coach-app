@@ -18,9 +18,9 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 ## Estado actual
 - **v1.0.0 publicada** (2026-10-30): tab Coberturas con 4-3-4 + Cover 3 (Sky) vs Shotgun 2x2, selector de hash, toggle pre/post-snap y panel de responsabilidad.
 - **Revisión de Samuel a v1.0.0:** aprobó el menú (espaciado, colores, tipografía), el campo, el pre/post-snap y los cambios de hash.
-- **v1.0.1 publicada** (2026-10-30): `CLAUDE.md` y ramas `release/`. Merge en `main` vía PR #1. Falta el tag `v1.0.1`.
-- **v1.1.0 construida** (2026-10-31) en la rama `release/1.1.0`: 30 combinaciones, 6 formaciones, arrastrar con Reset y tab Verificar. Falta el merge a `main` y el tag `v1.1.0`. Convenciones estándar elegidas sin el PDF: ver `docs/CONTENT-GUIDE.md`, sección "Convenciones de esta versión".
-- **v1.2.0 construida** (2026-11-10) en la rama `release/1.2.0` (sale de `release/1.1.0`): tab Comparar. Samuel pidió saltar la revisión de Verificar por ahora e ir a Comparar y Whiteboard.
+- **v1.0.1 publicada** (2026-10-30): `CLAUDE.md` y ramas `release/`. Merge en `main` vía PR #1 (sin tag).
+- **v1.1.0 publicada** (2026-10-31): 30 combinaciones, 6 formaciones, arrastrar con Reset y tab Verificar. Merge en `main` (`10bcb41`), tag `v1.1.0` puesto el 2026-11-10. Convenciones estándar elegidas sin el PDF: ver `docs/CONTENT-GUIDE.md`, sección "Convenciones de esta versión".
+- **v1.2.0 publicada** (2026-11-10): tab Comparar. Rama `release/1.2.0`, merge en `main` y tag `v1.2.0`. Samuel pidió saltar la revisión de Verificar por ahora e ir a Comparar y Whiteboard.
 - **Ramas (decisión de Samuel, 2026-11-10):** cada versión tiene su rama `release/X.Y.Z` y se hace merge a `main` cuando termina de construirse; la siguiente versión sale de `main`.
 - **Pendiente de Samuel:**
   - Revisar las 30 combinaciones en el modo Verificar cuando salga v1.1.0, incluida la Cover 3 de v1.0.0.
@@ -31,9 +31,9 @@ App web para que Samuel, coach de Defensive Backs de high school, enseñe a corn
 |---|---|---|
 | v1.0.0 | Setup, deploy, 4-3-4 + Cover 3 vs 2x2 | ✅ |
 | v1.0.1 | CLAUDE.md, convención de ramas `release/` | ✅ |
-| v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | ✅ construida, falta merge |
+| v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores con override y reset, modo **Verificar** | ✅ |
 | v1.1.x | Correcciones de Samuel desde el modo Verificar | |
-| v1.2.0 | **Comparar**: dos campos lado a lado con los cambios de rol resaltados (`engine/diff.ts`) | ✅ construida |
+| v1.2.0 | **Comparar**: dos campos lado a lado con los cambios de rol resaltados (`engine/diff.ts`) | ✅ |
 | v1.3.0 | **Whiteboard** | |
 | v1.4.0 | Biblioteca de jugadas (guardado manual, `localStorage`, `schemaVersion`), exportar PNG con Web Share, PWA offline | |
 | v2.0.0 | Animación snap → rutas → drops | |
