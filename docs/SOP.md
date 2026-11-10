@@ -32,7 +32,7 @@ Los cambios se agrupan en lotes semanales o mensuales. Una corrección urgente p
 | v1.0.0 | Setup, deploy y primer caso: 4-3-4 + Cover 3 vs 2x2 |
 | v1.1.0 | 6 frentes × 5 covers, 6 formaciones, arrastrar defensores, modo Verificar |
 | v1.2.0 | Comparar: dos campos lado a lado, una cosa a la vez, con los cambios resaltados |
-| v1.3.0 | Whiteboard |
+| v1.3.0 | Whiteboard: formaciones arrastrables, 12 rutas, motion, lápiz y overlay de la defensa |
 | v1.4.0 | Biblioteca de jugadas, exportar PNG, app instalable offline |
 | v1.x.y | Lotes de correcciones |
 | v2.0.0 | Animación |

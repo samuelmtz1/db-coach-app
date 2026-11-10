@@ -13,7 +13,7 @@ src/data/  ──►  src/engine/alignDefense()  ──►  src/components/field
 | `src/engine/` | Lógica pura y con tests: geometría del campo, strength, zonas, alineación. No importa React. |
 | `src/components/field/` | El campo y sus piezas en SVG (jugadores, zonas, flechas, leyenda). |
 | `src/components/ui/` | Controles reutilizables. |
-| `src/features/` | Un folder por tab (`coverage-lab/`, `compare/`, `verify/` y luego `whiteboard/`). `shared/solve.ts` une datos y motor para una situación. |
+| `src/features/` | Un folder por tab (`coverage-lab/`, `compare/`, `whiteboard/`, `verify/`). `shared/solve.ts` une datos y motor para una situación. |
 | `src/store/` | Estado de la app (Zustand). |
 | `src/app/` | Layout, header y navegación. |
 
@@ -32,6 +32,11 @@ Los hashes de high school están a 17.78 yd (53'4") de cada sideline. La línea 
 5. Aplica los `overrides` (defensores arrastrados a mano): cambian `pre`, no el rol. `auto` guarda la posición de regla.
 6. Destino post-snap: zona, man, rush o blitz. Un man sin receptor prueba su `fallback` y, si no hay nadie, hace blitz.
 
+## Whiteboard (`engine/board.ts`)
+- La ofensiva del pizarrón son puntos libres. `resolveBoardOffense` decide quién es back: un elegible dentro de la caja (balón ± tackle + 1.5 yd) y a 2.5 yd o más detrás de la LOS. Con eso, `alignAgainst(front, cover, assignments, offense, ball)` alinea la defensa igual que en Coberturas (hay un test que lo compara).
+- Rutas del menú: `data/routes.ts`. `routeOffsets` las convierte en offsets desde el jugador: `dx` positivo = hacia su sideline; `y` desde la LOS (`from: 'los'`) o desde el jugador (`from: 'start'`, screens).
+- Nada arriba del campo puede cambiar de alto mientras se arrastra (la línea de strength va debajo): si el campo se recorre a media jugada, el dedo cae en otra yarda.
+
 ## Comparar (`engine/diff.ts`)
 `diffSnapshots(a, b)` cruza las dos defensas por id de jugador (los ids son iguales en todos los frentes). Estado de cada defensor, en este orden de prioridad:
 - `role`: cambia `roleLabel` (o si es híbrido).
@@ -43,11 +48,12 @@ Los hashes de high school están a 17.78 yd (53'4") de cada sideline. La línea 
 ## Estado
 - `store/labStore.ts`: tab Coberturas (frente, cover, formación, hash, fase, overrides). No se guarda.
 - `store/compareStore.ts`: tab Comparar (qué cambia, situación base, valor de A y de B, fase, seleccionado). No se guarda.
+- `store/boardStore.ts`: tab Whiteboard. `doc` (formación, hash, jugadores, rutas, trazos; `schemaVersion: 1`) con historial `past`/`future` para deshacer. `commit` = un paso; `beginGesture` + `live` = arrastres y trazos (un paso por gesto). Se guardan `doc` y `ui` en `localStorage` (`db-coach:whiteboard`, versión 1); el historial no.
 - `store/verifyStore.ts`: tab Verificar. Se guarda en `localStorage` (`db-coach:verify`, versión 1) con `persist` de Zustand.
   Cada marca guarda un `snapshot` (rol | alineación | profundidad); si el contenido cambia, la marca queda como "cambió, revísalo otra vez".
 - `features/verify/checklist.ts`: lógica pura de Verificar (tabla, progreso, resumen), con tests.
 
 ## Tabs
-`app/App.tsx` lee el tab de la URL (`#coberturas`, `#comparar`, `#verificar`).
+`app/App.tsx` lee el tab de la URL (`#coberturas`, `#comparar`, `#whiteboard`, `#verificar`).
 
 Versión de la app: `package.json` → `__APP_VERSION__` (definido en `vite.config.ts`) → pie de página.

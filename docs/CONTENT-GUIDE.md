@@ -68,6 +68,14 @@ Las formaciones están fijas: los 3 receptores de 3x1, Trips, Bunch y Empty van 
 - Cover 3 con Nickel (4-2-5, 3-3-5): el Nickel toma el curl/flat strong y el SS baja al hook/curl strong.
 - Cover 0: el #2 strong lo toma el SS / Nickel / Spur / Bandit; el #2 weak, el Will (Jack en 3-5-3, con el FB como alterno); el RB, el Mike; el #3 strong, el FS. El resto, blitz.
 
+## Rutas del whiteboard (`src/data/routes.ts`)
+Cada ruta es una lista de puntos `[dx, y]`:
+- `dx`: yardas hacia el sideline del receptor (negativo = hacia adentro).
+- `y`: con `from: 'los'`, profundidad desde la LOS (un Out a 10 cruza a 10 yd venga de donde venga). Con `from: 'start'`, yardas desde donde está el jugador (screens).
+- `backfield`: versión opcional para un RB/FB.
+
+Ejemplo, un Out más corto: `{ id: 'out', name: 'Out', from: 'los', points: [[0, 6], [7, 6]] }`. Son conceptos: no se muestran profundidades en el campo.
+
 ## Renombrar posiciones
 `src/data/positions.ts`: `short` es lo que se ve dentro del círculo y `name` lo que se ve en el panel.
 

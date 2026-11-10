@@ -55,7 +55,6 @@ interface DefenderProps {
 }
 
 export function Defender({ d, at, selected, dimmed = false, marked = false, onSelect, onMove }: DefenderProps) {
-  const color = colorFor(d.kind, d.zone?.family)
   const pos = position(d.pos)
   const ref = useRef<SVGGElement>(null)
   const drag = useRef<{ id: number; cx: number; cy: number; off: Point; moved: boolean } | null>(null)
@@ -149,10 +148,20 @@ export function Defender({ d, at, selected, dimmed = false, marked = false, onSe
       <circle r={2} fill="transparent" />
       {marked && <circle r={R + 0.45} fill="none" stroke={FIELD_COLORS.changed} strokeWidth={0.2} />}
       {selected && <circle r={R + (marked ? 0.9 : 0.6)} fill="none" stroke={FIELD_COLORS.selected} strokeWidth={0.22} />}
+      <DefenderGlyph d={d} />
+    </g>
+  )
+}
+
+/** El círculo del defensor: anillo del color de su responsabilidad, punteado si es híbrido. */
+export function DefenderGlyph({ d }: { d: ResolvedDefender }) {
+  const pos = position(d.pos)
+  return (
+    <>
       <circle
         r={R}
         fill={FIELD_COLORS.defense}
-        stroke={color}
+        stroke={colorFor(d.kind, d.zone?.family)}
         strokeWidth={0.3}
         strokeDasharray={d.hybrid ? '0.42 0.28' : undefined}
       />
@@ -165,7 +174,7 @@ export function Defender({ d, at, selected, dimmed = false, marked = false, onSe
       >
         {pos.short}
       </text>
-    </g>
+    </>
   )
 }
 

@@ -2,17 +2,18 @@ import { useEffect, useState } from 'react'
 import { ComparePage } from '../features/compare/ComparePage'
 import { CoverageLab } from '../features/coverage-lab/CoverageLab'
 import { VerifyMode } from '../features/verify/VerifyMode'
+import { Whiteboard } from '../features/whiteboard/Whiteboard'
 
-type Route = 'coberturas' | 'comparar' | 'verificar'
+type Route = 'coberturas' | 'comparar' | 'whiteboard' | 'verificar'
 
-const TABS = [
-  { id: 'coberturas', label: 'Coberturas', ready: true },
-  { id: 'comparar', label: 'Comparar', ready: true },
-  { id: 'verificar', label: 'Verificar', ready: true },
-  { id: 'whiteboard', label: 'Whiteboard', ready: false },
-] as const
+const TABS: { id: Route; label: string }[] = [
+  { id: 'coberturas', label: 'Coberturas' },
+  { id: 'comparar', label: 'Comparar' },
+  { id: 'whiteboard', label: 'Whiteboard' },
+  { id: 'verificar', label: 'Verificar' },
+]
 
-const ROUTES: Route[] = ['coberturas', 'comparar', 'verificar']
+const ROUTES = TABS.map((t) => t.id)
 
 /** El tab vive en la URL (#comparar) para que recargar o compartir el link abra el mismo tab. */
 function useRoute(): Route {
@@ -42,24 +43,17 @@ export function App() {
           <nav aria-label="Secciones" className="-mx-4 max-w-[100vw] overflow-x-auto px-4 sm:mx-0 sm:px-0">
             <ul className="flex gap-1 whitespace-nowrap">
               {TABS.map((t) => (
-                <li key={t.id} className={t.ready ? undefined : 'hidden sm:block'}>
-                  {t.ready ? (
-                    <a
-                      href={`#${t.id}`}
-                      aria-current={route === t.id ? 'page' : undefined}
-                      className={[
-                        'inline-flex min-h-11 items-center border-b-2 px-3 font-display text-lg font-semibold transition-colors',
-                        route === t.id ? 'border-accent text-text' : 'border-transparent text-muted hover:text-text',
-                      ].join(' ')}
-                    >
-                      {t.label}
-                    </a>
-                  ) : (
-                    <span className="inline-flex min-h-11 items-center px-3 font-display text-lg font-semibold text-muted">
-                      {t.label}
-                      <span className="ml-1.5 rounded bg-panel-2 px-1.5 text-xs text-muted">Próximamente</span>
-                    </span>
-                  )}
+                <li key={t.id}>
+                  <a
+                    href={`#${t.id}`}
+                    aria-current={route === t.id ? 'page' : undefined}
+                    className={[
+                      'inline-flex min-h-11 items-center border-b-2 px-3 font-display text-lg font-semibold transition-colors',
+                      route === t.id ? 'border-accent text-text' : 'border-transparent text-muted hover:text-text',
+                    ].join(' ')}
+                  >
+                    {t.label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -68,7 +62,15 @@ export function App() {
       </header>
 
       <main className="mx-auto w-full max-w-[110rem] flex-1 px-4 py-4 sm:px-6">
-        {route === 'verificar' ? <VerifyMode /> : route === 'comparar' ? <ComparePage /> : <CoverageLab />}
+        {route === 'verificar' ? (
+          <VerifyMode />
+        ) : route === 'comparar' ? (
+          <ComparePage />
+        ) : route === 'whiteboard' ? (
+          <Whiteboard />
+        ) : (
+          <CoverageLab />
+        )}
       </main>
 
       <footer className="px-4 py-3 text-center text-xs text-muted sm:px-6">DB Coach v{__APP_VERSION__}</footer>

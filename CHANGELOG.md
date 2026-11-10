@@ -5,6 +5,20 @@ Todas las versiones siguen [SemVer](https://semver.org/lang/es/): `MAYOR.MENOR.P
 - **MENOR**: funcionalidad nueva compatible (tab, frente, cover, formación).
 - **MAYOR**: cambios que rompen lo anterior (p. ej. formato de jugadas guardadas).
 
+## [1.3.0] - 2026-11-10
+### Agregado
+- Tab **Whiteboard** para usar en vivo:
+  - Plantillas de las 6 formaciones y jugadores ofensivos que se arrastran (dedo, mouse o flechas del teclado).
+  - Menú de 12 rutas para el jugador elegido: Slant, Out, Go, Fade, Post, Curl, Flat, Wheel, Screen, Checkdown, Dig y Comeback. Abren hacia el sideline del receptor y la ruta sigue al jugador si lo mueves. Flat, Wheel, Screen y Checkdown tienen versión para el RB.
+  - **Ruta a mano**: rutas punto por punto.
+  - Línea **sólida / punteada**. **Marcar pre-snap** deja un círculo punteado y una línea punteada marca el motion hasta donde arrastres al jugador.
+  - **Lápiz** libre en blanco, amarillo o rojo, **Borrador**, **Deshacer / Rehacer** (⌘Z, ⇧⌘Z) y **Borrar dibujos**.
+  - Overlay de la defensa (frente + cover, pre-snap y post-snap) que se recalcula al mover receptores: si el RB se abre, cuenta como receptor y la strength cambia. Botón para mostrarla u ocultarla.
+  - La pizarra se guarda sola en el dispositivo (`db-coach:whiteboard`, `schemaVersion` 1).
+### Cambiado
+- Los 4 tabs ya están activos: Coberturas, Comparar, Whiteboard, Verificar.
+- Motor: `alignAgainst()` alinea la defensa contra una ofensiva ya colocada; `alignDefense()` la usa por dentro.
+
 ## [1.2.0] - 2026-11-10
 ### Agregado
 - Tab **Comparar**: dos campos lado a lado. Eliges qué cambia (Cover, Formación, Frente o Hash) y todo lo demás es igual en los dos.
