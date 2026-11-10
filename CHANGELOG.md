@@ -5,6 +5,16 @@ Todas las versiones siguen [SemVer](https://semver.org/lang/es/): `MAYOR.MENOR.P
 - **MENOR**: funcionalidad nueva compatible (tab, frente, cover, formación).
 - **MAYOR**: cambios que rompen lo anterior (p. ej. formato de jugadas guardadas).
 
+## [1.2.0] - 2026-11-10
+### Agregado
+- Tab **Comparar**: dos campos lado a lado. Eliges qué cambia (Cover, Formación, Frente o Hash) y todo lo demás es igual en los dos.
+- Los defensores que cambian llevan un halo blanco y el resto se atenúa con sus zonas y flechas. Botón **Resaltar cambios** para apagarlo.
+- Lista **Qué cambia**: por defensor, responsabilidad y alineación en A y en B. Distingue "cambia responsabilidad", "cambia alineación", "misma regla, otro lugar" y "solo en A / B" (p. ej. el Nickel al comparar 4-3-4 con 4-2-5).
+- Tocar un defensor lo selecciona en los dos campos y en la lista. Pre-snap / Post-snap y la barra espaciadora controlan los dos campos a la vez.
+- Botón **Invertir A ⇄ B**.
+### Cambiado
+- El orden de los tabs: Coberturas, Comparar, Verificar.
+
 ## [1.1.0] - 2026-10-31
 ### Agregado
 - Los 6 frentes (4-3-4, 3-4-4, 4-2-5, 3-3-5, 3-5-3, 5-3-3) con los 5 covers base (0, 2, 3, 4, 6): 30 combinaciones cargadas con la versión estándar, para revisar en el modo Verificar.

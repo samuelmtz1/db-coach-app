@@ -10,8 +10,19 @@ interface Props<T extends string> {
   value: T
   options: Option<T>[]
   onChange: (value: T) => void
-  columns?: 2 | 3
+  columns?: Columns
   note?: string
+}
+
+type Columns = 2 | 3 | 4 | 5 | 6
+
+// Clases completas (no armadas con template strings) para que Tailwind las encuentre.
+const GRID: Record<Columns, string> = {
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
+  5: 'grid-cols-5',
+  6: 'grid-cols-3 sm:grid-cols-6',
 }
 
 /** Grupo de botones excluyentes (tipo radio), cómodo para el dedo en iPad. */
@@ -19,7 +30,7 @@ export function OptionGroup<T extends string>({ label, value, options, onChange,
   return (
     <fieldset>
       <legend className="mb-2 font-display text-sm font-semibold tracking-wide text-muted">{label}</legend>
-      <div className={`grid gap-1.5 ${columns === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+      <div className={`grid gap-1.5 ${GRID[columns]}`}>
         {options.map((o) => {
           const active = o.value === value
           return (

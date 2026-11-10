@@ -24,6 +24,8 @@ export const FIELD_COLORS = {
   offense: '#f5f5f2',
   offenseText: '#14171b',
   selected: '#ffd23f',
+  /** Halo del defensor que cambia en el tab Comparar. */
+  changed: '#ffffff',
   /** Letra del híbrido (LB en rol de DB). El borde del círculo va punteado en el color de su responsabilidad. */
   hybridText: '#ff4d4d',
 }

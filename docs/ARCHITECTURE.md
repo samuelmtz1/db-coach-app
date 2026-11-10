@@ -13,7 +13,7 @@ src/data/  ──►  src/engine/alignDefense()  ──►  src/components/field
 | `src/engine/` | Lógica pura y con tests: geometría del campo, strength, zonas, alineación. No importa React. |
 | `src/components/field/` | El campo y sus piezas en SVG (jugadores, zonas, flechas, leyenda). |
 | `src/components/ui/` | Controles reutilizables. |
-| `src/features/` | Un folder por tab (`coverage-lab/`, y luego `compare/`, `whiteboard/`, `verify/`). |
+| `src/features/` | Un folder por tab (`coverage-lab/`, `compare/`, `verify/` y luego `whiteboard/`). `shared/solve.ts` une datos y motor para una situación. |
 | `src/store/` | Estado de la app (Zustand). |
 | `src/app/` | Layout, header y navegación. |
 
@@ -32,13 +32,22 @@ Los hashes de high school están a 17.78 yd (53'4") de cada sideline. La línea 
 5. Aplica los `overrides` (defensores arrastrados a mano): cambian `pre`, no el rol. `auto` guarda la posición de regla.
 6. Destino post-snap: zona, man, rush o blitz. Un man sin receptor prueba su `fallback` y, si no hay nadie, hace blitz.
 
+## Comparar (`engine/diff.ts`)
+`diffSnapshots(a, b)` cruza las dos defensas por id de jugador (los ids son iguales en todos los frentes). Estado de cada defensor, en este orden de prioridad:
+- `role`: cambia `roleLabel` (o si es híbrido).
+- `align`: cambia `alignLabel` o la profundidad en 1 yd o más.
+- `moved`: misma regla, pero la alineación de regla se recorre `MOVE_STEP` (1.5 yd) o más medida desde el balón. Así un cambio de hash no marca a la DL, que se mueve con el balón.
+- `onlyA` / `onlyB`: el jugador existe solo en un frente.
+- `same`.
+
 ## Estado
 - `store/labStore.ts`: tab Coberturas (frente, cover, formación, hash, fase, overrides). No se guarda.
+- `store/compareStore.ts`: tab Comparar (qué cambia, situación base, valor de A y de B, fase, seleccionado). No se guarda.
 - `store/verifyStore.ts`: tab Verificar. Se guarda en `localStorage` (`db-coach:verify`, versión 1) con `persist` de Zustand.
   Cada marca guarda un `snapshot` (rol | alineación | profundidad); si el contenido cambia, la marca queda como "cambió, revísalo otra vez".
 - `features/verify/checklist.ts`: lógica pura de Verificar (tabla, progreso, resumen), con tests.
 
 ## Tabs
-`app/App.tsx` lee el tab de la URL (`#coberturas`, `#verificar`).
+`app/App.tsx` lee el tab de la URL (`#coberturas`, `#comparar`, `#verificar`).
 
 Versión de la app: `package.json` → `__APP_VERSION__` (definido en `vite.config.ts`) → pie de página.
